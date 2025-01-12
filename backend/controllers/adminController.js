@@ -125,7 +125,7 @@ export const adminLogin = async (req, res) => {
     }
 
     const token = jwt.sign({ email: admin.email }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "5h",
     });
 
     
