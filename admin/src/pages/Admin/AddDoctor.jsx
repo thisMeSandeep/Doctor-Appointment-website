@@ -61,10 +61,13 @@ const AddDoctor = () => {
         setAddress1("");
         setAddress2("");
         setDocImg(false);
+      } else {
+        toast.error(data.message);
       }
 
 
     } catch (err) {
+      err.response ? toast.error(err.response.data.message) : toast.error("Something went wrong");
       console.log(err);
     }
 
