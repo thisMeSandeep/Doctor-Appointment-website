@@ -22,3 +22,31 @@ export const changeAvailability = async (req, res) => {
     });
   }
 };
+
+//get all doctors list
+
+export const doctorList = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find().select(["-password", "-email"]);
+
+    //if no doctors in DB
+    if (!doctors || doctors.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No doctors found !",
+      }); 
+    }
+
+    res.status(200).json({
+      success: true,
+      message: " doctors found",
+      doctors,
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};

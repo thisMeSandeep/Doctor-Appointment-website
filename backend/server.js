@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import connectCloudinary from "./config/cloudinary.js";
 import adminRouter from "./routes/adminRoute.js";
-
-dotenv.config();
+import doctorRouter from "./routes/doctorRoute.js";
 
 //app config
 
@@ -21,7 +21,9 @@ app.use(cors());
 
 //api end points
 
-app.use("/api/admin", adminRouter); //localhost:4000/api/admin
+app.use("/api/admin", adminRouter);
+
+app.use("/api/doctor", doctorRouter);
 
 //start server
 const startServer = async () => {
