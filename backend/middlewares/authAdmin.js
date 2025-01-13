@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 const authAdmin = async (req, res, next) => {
   try {
     const { atoken } = req.headers;
-
+  
     if (!atoken) {
       return res.status(401).json({
         success: false,
@@ -31,6 +31,5 @@ const authAdmin = async (req, res, next) => {
     });
   }
 };
-
 
 export default authAdmin;

@@ -144,3 +144,23 @@ export const adminLogin = async (req, res) => {
     });
   }
 };
+
+
+//get all doctors data
+
+export const getDoctors = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find().select("-password");
+
+    res.status(200).json({
+      success: true,
+      doctors,
+    });
+  } catch (err) {
+    console.error(`Failed to get doctors: ${err.message}`);
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+}

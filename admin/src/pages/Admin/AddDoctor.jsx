@@ -68,7 +68,7 @@ const AddDoctor = () => {
 
     } catch (err) {
       err.response ? toast.error(err.response.data.message) : toast.error("Something went wrong");
-      console.log(err);
+      toast.error(err.message);
     }
 
   }
