@@ -10,13 +10,13 @@ export const changeAvailability = async (req, res) => {
       available: !docData.available,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Availability changed",
     });
   } catch (err) {
     console.log(err.message);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message,
     });
@@ -31,20 +31,20 @@ export const doctorList = async (req, res) => {
 
     //if no doctors in DB
     if (!doctors || doctors.length === 0) {
-      res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "No doctors found !",
-      }); 
+      });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: " doctors found",
       doctors,
     });
   } catch (err) {
     console.log(err.message);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: err.message,
     });

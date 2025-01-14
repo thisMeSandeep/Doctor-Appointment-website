@@ -1,11 +1,23 @@
 import { NavLink, useNavigate } from "react-router-dom"
 import { assets } from "../assets/assets_frontend/assets"
 import { useState } from "react"
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
     const [showMenu, setShowMenu] = useState(false);
-    const [token, setToken] = useState(true);
+
+    const { token, setToken } = useContext(AppContext)
+
     const navigate = useNavigate()
+
+
+    //logout user
+    const logout = () => {
+        setToken(false);
+        localStorage.removeItem('token');
+        navigate('/')
+    }
 
     return (
         <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
@@ -39,13 +51,13 @@ const Navbar = () => {
                                     <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
                                         <p onClick={() => navigate('my-profile')} className="hover:text-black cursor-pointer">My Profile</p>
                                         <p onClick={() => navigate('my-appointments')} className="hover:text-black cursor-pointer">My Appointements </p>
-                                        <p onClick={() => setToken(false)} className="hover:text-black cursor-pointer">Logout</p>
+                                        <p onClick={() => logout()} className="hover:text-black cursor-pointer">Logout</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         :
-                        <button onClick={() => navigate('/login')} className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block">Create account</button>
+                        <button onClick={() => navigate('/login')} className="bg-primary text-white px-10 py-3 rounded-full font-light hidden md:block">Sign In</button>
                 }
                 <img src={assets.menu_icon} alt="" className="w-6 md:hidden" onClick={() => setShowMenu(true)} />
                 {/* ------mobile menu------ */}

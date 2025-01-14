@@ -1,10 +1,14 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { AppContext } from "../context/AppContext";
+import axios from "axios"
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 
 const Login = () => {
 
 
-  const [state, setState] = useState('Sign Up');
+  const [state, setState] = useState('Login');
 
   const [userAuthDetails, setUserAuthDetails] = useState({
     name: '',
@@ -12,15 +16,45 @@ const Login = () => {
     password: '',
   });
 
+  const navigate = useNavigate();
+
+  const { backendUrl, token, setToken } = useContext(AppContext);
+
   //on submit function
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    // try {
+    try {
+      if (state === "Sign Up") {
+        const { data } = await axios.post(`${backendUrl}/api/user/register`, userAuthDetails);
+        if (data.success) {
+          setToken(data.token);
+          localStorage.setItem('token', data.token);
+          console.log(data.token)
+          toast.success(data.message)
+          navigate('/')
+        } else {
+          toast.error(data.message)
+        }
+      } else {
+        const { data } = await axios.post(`${backendUrl}/api/user/login`, userAuthDetails);
+        if (data.success) {
+          localStorage.setItem('token', data.token);
+          setToken(data.token);
+          toast.success(data.message);
+          navigate('/')
+        } else {
+          toast.error(data.message)
+        }
+      }
 
-    // } catch (err) {
-
-    // }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error(err.message);
+      }
+    }
   }
 
   //handle onChnage
@@ -60,7 +94,7 @@ const Login = () => {
           <input type="password" name="password" value={userAuthDetails.password} onChange={handleOnChange} autoComplete="true" required className="border border-zinc-300 rounded w-full mt-1 p-2" />
         </div>
 
-        <button className="bg-primary text-white w-full py-2 rounded-md text-base">{state === 'Sign Up' ? "Create Account" : "Login"}</button>
+        <button type="submit" className="bg-primary text-white w-full py-2 rounded-md text-base">{state === 'Sign Up' ? "Create Account" : "Login"}</button>
 
         {
           state === "Sign Up" ? <p>Already have an account? <span onClick={() => setState('Login')} className="text-primary underline cursor-pointer">Login here</span></p> : <p>Create a new account? <span onClick={() => setState('Sign Up')} className="text-primary underline cursor-pointer">click here</span></p>
