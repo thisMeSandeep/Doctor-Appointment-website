@@ -2,7 +2,7 @@ import validator from "validator";
 import userModel from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { json } from "express";
+import { v2 as cloudinary } from "cloudinary";
 
 //register user
 
@@ -117,12 +117,80 @@ export const loginUser = async (req, res) => {
       message: "Login Successful",
       token,
     });
-    
   } catch (err) {
     console.log(err.message);
     return res.status(500).json({
       success: false,
       message: err.message,
+    });
+  }
+};
+
+//get user data
+
+export const getProfile = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const userData = await userModel.findById(userId).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "User data found",
+      userData,
+    });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+//update user Profile
+
+export const updateProfile = async (req, res) => {
+  try {
+    const { userId, name, phone, address, dob, gender } = req.body;
+
+    const imageFile = req.file;
+
+    if (!name || !phone || !dob || !gender) {
+      return res.status(400).json({
+        success: false,
+        message: "Data is missing",
+      });
+    }
+
+    //update user data
+    await userModel.findByIdAndUpdate(userId, {
+      name,
+      phone,
+      address: JSON.parse(address),
+      dob,
+      gender,
+    });
+
+    if (imageFile) {
+      //upload image to cloudinary
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+        resource_type: "image",
+      });
+      const imageURL = imageUpload.secure_url;
+
+      await userModel.findByIdAndUpdate(userId, { image: imageURL });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile Updated",
+    });
+  } catch (err) {
+    console.log(err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
