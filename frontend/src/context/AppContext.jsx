@@ -9,6 +9,7 @@ const AppContextProvider = ({ children }) => {
 
     const [doctors, setDoctors] = useState([]);
     const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : false);
+    const [userData, setUserData] = useState(false);
 
     const currencySymbol = '$';
 
@@ -35,16 +36,49 @@ const AppContextProvider = ({ children }) => {
         }
     }
 
+
+    //get user data
+
+    const getUserData = async () => {
+        try {
+            const { data } = await axios.get(`${backendUrl}/api/user/get-profile`, { headers: { token } });
+            console.log('user data : ' + data);
+            if (data.success) {
+                setUserData(data.userData);
+            } else {
+                toast.error(data.message)
+            }
+        } catch (err) {
+            console.error("Error fetching user data:", err.message);
+            toast.error(err.response?.data?.message || "Failed to fetch user data");
+            setUserData(false); 
+        }
+    }
+
+
     useEffect(() => {
         getDoctorsData();
     }, [])
+
+
+    useEffect(() => {
+        if (token) {
+            getUserData();
+        } else {
+            setUserData(false)
+        }
+    }, [token])
+
 
     const value = {
         doctors,
         currencySymbol,
         token,
         setToken,
-        backendUrl
+        backendUrl,
+        userData,
+        setUserData,
+        getUserData
     }
 
     return (

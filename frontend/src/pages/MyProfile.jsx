@@ -1,28 +1,67 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
+import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets_frontend/assets"
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const MyProfile = () => {
 
-  const [userData, setUserData] = useState({
-    name: "Sandep singh",
-    image: assets.profile_pic,
-    email: "snayal50@gmail.com",
-    phone: "9305787991",
-    address: {
-      line1: "lucknow",
-      line2: "uttarpradesh"
-    },
-    gender: "Male",
-    dob: '2000-01-20'
-  });
 
 
   const [isEdit, setIsEdit] = useState(false);
 
+  const { userData, setUserData, token, backendUrl, getUserData } = useContext(AppContext);
 
-  return (
+  const [image, setImage] = useState(false);
+
+  const updateUserProfileData = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('name', userData.name);
+      formData.append('phone', userData.phone);
+      formData.append('address', JSON.stringify(userData.address));
+      formData.append('gender', userData.gender);
+      formData.append('dob', userData.dob);
+      image && formData.append('image', image);
+
+      const { data } = await axios.post(`${backendUrl}/api/user/update-profile`, formData, { headers: { token } })
+
+      if (data.success) {
+        toast.success(data.message);
+        await getUserData();
+        setIsEdit(false);
+        setImage(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err.message);
+      toast.error(err.response?.data?.message || "Failed to update");
+    }
+  }
+
+
+  if (!userData) {
+    return (
+      <p className="text-lg font-medium">Loading your  Profile...</p>
+    )
+  }
+
+  return userData && (
     <div className="max-w-lg flex flex-col gap-2 text-sm">
-      <img src={userData.image} alt="" className="w-36 rounded" />
+
+      {
+        isEdit
+          ? <label htmlFor="image">
+            <div className="inline-block relative cursor-pointer">
+              <img src={image ? URL.createObjectURL(image) : userData.image} alt="" className="w-36 rounded opacity-75" />
+              <img src={image ? '' : assets.upload_icon} alt="" className="w-10 absolute bottom-12 right-12" />
+            </div>
+            <input type="file" id="image" hidden onChange={(e) => setImage(e.target.files[0])} />
+          </label>
+          : <img src={userData.image} alt="" className="w-36 rounded" />
+      }
+
 
       {
         isEdit ? <input type="text" value={userData.name} onChange={e => setUserData(prev => ({ ...prev, name: e.target.value }))} className="bg-gray-50 text-3xl font-medium max-w-60 mt-4" /> : <p className="font-medium text-3xl text-neutral-800 mt-4">{userData.name}</p>
@@ -37,7 +76,7 @@ const MyProfile = () => {
           <p className="text-blue-500">{userData.email}</p>
           <p className="font-medium">Phone:</p>
           {
-            isEdit ? <input className="bg-gray-100 max-w-52 " type="text" value={userData.phone} onChange={e => setUserData(prev => ({ ...prev, namphone: e.target.value }))} /> : <p className="text-blue-400">{userData.phone}</p>
+            isEdit ? <input className="bg-gray-100 max-w-52 " type="text" value={userData.phone} onChange={e => setUserData(prev => ({ ...prev, phone: e.target.value }))} /> : <p className="text-blue-400">{userData.phone}</p>
           }
           <p className="font-medium">Address</p>
           {
@@ -81,7 +120,7 @@ const MyProfile = () => {
       <div className="mt-10">
         {
           isEdit
-            ? <button className="border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300" onClick={() => setIsEdit(false)}>Save information</button>
+            ? <button className="border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300" onClick={updateUserProfileData}>Save information</button>
             : <button className="border border-primary px-8 py-2 rounded-full hover:bg-primary hover:text-white transition-all duration-300" onClick={() => setIsEdit(true)}>Edit</button>
         }
       </div>

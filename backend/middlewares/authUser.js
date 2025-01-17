@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 
-const authUser = async (req, res,next) => {
+const authUser = async (req, res, next) => {
   try {
     const { token } = req.headers;
+ 
 
     if (!token) {
       return res.status(401).json({
