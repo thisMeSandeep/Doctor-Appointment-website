@@ -207,18 +207,18 @@ export const bookAppointment = async (req, res) => {
 
     //doctor not available
     if (!docData.available) {
-      return res.status(404).JSON({
+      return res.status(404).json({
         success: false,
         message: "Doctor not available",
       });
     }
 
-    let slots_booked = docData.slotes_booked;
+    let slots_booked = docData.slots_booked || {};
 
     // check for slot availability
     if (slots_booked[slotDate]) {
       if (slots_booked[slotDate].includes(slotTime)) {
-        return res.status(404).JSON({
+        return res.status(404).json({
           success: false,
           message: "Slot not available",
         });
@@ -226,17 +226,16 @@ export const bookAppointment = async (req, res) => {
         slots_booked[slotDate].push(slotTime);
       }
     } else {
-      slots_booked[slotDate] = [];
-      slots_booked[slotDate].push(slotTime);
+      slots_booked[slotDate] = [slotTime];
     }
 
     const userData = await userModel.findById(userId).select("-password");
 
-    delete docData.slotes_booked;
+    delete docData.slots_booked;
 
     const appointmentData = {
       userId,
-      docId,
+      doctorId: docId, // Update the key name to match your schema
       userData,
       docData,
       amount: docData.fees,
@@ -245,16 +244,16 @@ export const bookAppointment = async (req, res) => {
       date: Date.now(),
     };
 
-    const newAppoitment = new appointmentModel(appointmentData);
+    const newAppointment = new appointmentModel(appointmentData);
     //save new appointment
-    await newAppoitment.save();
+    await newAppointment.save();
 
-    //save new slotes data in doc data
+    //save new slots data in doc data
     await doctorModel.findByIdAndUpdate(docId, { slots_booked });
 
     return res.status(200).json({
       success: true,
-      message: "appointment Booked",
+      message: "Appointment booked",
     });
   } catch (err) {
     console.log(err.message);
@@ -264,3 +263,4 @@ export const bookAppointment = async (req, res) => {
     });
   }
 };
+

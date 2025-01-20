@@ -51,7 +51,7 @@ const AppContextProvider = ({ children }) => {
         } catch (err) {
             console.error("Error fetching user data:", err.message);
             toast.error(err.response?.data?.message || "Failed to fetch user data");
-            setUserData(false); 
+            setUserData(false);
         }
     }
 
@@ -72,6 +72,7 @@ const AppContextProvider = ({ children }) => {
 
     const value = {
         doctors,
+        getDoctorsData,
         currencySymbol,
         token,
         setToken,

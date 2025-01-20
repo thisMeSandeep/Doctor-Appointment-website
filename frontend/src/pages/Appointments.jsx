@@ -3,6 +3,9 @@ import { useParams } from "react-router-dom"
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets_frontend/assets";
 import RelatedDoctors from "../components/RelatedDoctors";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Appointments = () => {
   const [docInfo, setDocInfo] = useState(null);
@@ -10,9 +13,11 @@ const Appointments = () => {
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState('');
 
+  const navigate = useNavigate();
+
 
   const { docId } = useParams();
-  const { doctors, currencySymbol } = useContext(AppContext);
+  const { doctors, currencySymbol, backendUrl, token, getDoctorsData } = useContext(AppContext);
   const daysOfWeek = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
   const fetchDocInfo = async () => {
@@ -63,6 +68,45 @@ const Appointments = () => {
 
       setDocSlotes(prev => ([...prev, timeSlots]));
 
+    }
+  }
+
+
+  //book appoitment
+
+  const bookAppointment = async () => {
+    if (!token) {
+      toast.warn('Login to book appointment');
+      return navigate('/login')
+    }
+
+    try {
+      const date = docSlotes[slotIndex][0].datetime
+
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+
+      const slotDate = day + "_" + month + "_" + year;
+
+      console.log(slotDate);
+
+      const { data } = await axios.post(`${backendUrl}/api/user/book-appointment`, { docId, slotDate, slotTime }, { headers: { token } })
+
+      if (data.success) {
+        toast.success(data.message);
+        getDoctorsData();
+        navigate("/my-appointment")
+      } else {
+        toast.error(data.message);
+      }
+
+    } catch (err) {
+      if (err.response?.data?.success) {
+        toast.error(err.response.data.success);
+      } else {
+        toast.error(err.message)
+      }
     }
   }
 
@@ -135,7 +179,8 @@ const Appointments = () => {
           }
         </div>
 
-        <button className="bg-primary text-white text-sm font-light py-3 px-14 rounded-full my-6">Book an appointment</button>
+        {/* book appoitment button */}
+        <button onClick={bookAppointment} className="bg-primary text-white text-sm font-light py-3 px-14 rounded-full my-6">Book an appointment</button>
 
       </div>
       {/* Listing related doctors */}
