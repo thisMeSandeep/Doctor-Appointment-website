@@ -5,6 +5,8 @@ import {
   getProfile,
   updateProfile,
   bookAppointment,
+  ListAppointment,
+  cancelAppoitment,
 } from "../controllers/userController.js";
 
 import authUser from "../middlewares/authUser.js";
@@ -21,6 +23,8 @@ userRouter.post(
   authUser,
   updateProfile
 );
-userRouter.post("/book-appointment", authUser, bookAppointment);
+userRouter.post("/book-appointment", authUser, bookAppointment); //book appointment
+userRouter.get("/appointments", authUser, ListAppointment); // appointments list
+userRouter.post("/cancel-appointment", authUser, cancelAppoitment); //cancel appoitments
 
 export default userRouter;

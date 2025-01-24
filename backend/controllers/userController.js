@@ -264,3 +264,78 @@ export const bookAppointment = async (req, res) => {
   }
 };
 
+// get user's appointments controller
+
+export const ListAppointment = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    const appointments = await appointmentModel.find({ userId });
+
+    if (appointments.length === 0) {
+      return res.status(200).json({
+        success: false,
+        message: "No appointments",
+      });
+    }
+
+    //return appointments
+    return res.status(200).json({
+      success: true,
+      appointments,
+    });
+  } catch (err) {
+    console.log(err.name + ":" + err.message);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+//cancel appoitment controller
+
+export const cancelAppoitment = async (req, res) => {
+  try {
+    const { userId, appointmentId } = req.body;
+
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+    // verify appopintment user
+    if (appointmentData.userId !== userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Unauthorized action!",
+      });
+    }
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      cancelled: true,
+    });
+
+    // free doctor slot
+
+    const { docId, slotDate, slotTime } = appointmentData;
+
+    const doctorData = await doctorModel.findById(docId);
+
+    let slots_booked = doctorData.slots_booked;
+
+    slots_booked[slotDate] = slots_booked[slotDate].filter(
+      (e) => e != slotTime
+    );
+
+    await doctorModel.findByIdAndUpdate(docId, { slots_booked });
+
+    res.status(200).json({
+      success: true,
+      message: "Appointment cancelled",
+    });
+  } catch (err) {
+    console.log(err.name + ":" + err.message);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
