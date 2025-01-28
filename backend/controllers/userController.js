@@ -301,6 +301,8 @@ export const cancelAppoitment = async (req, res) => {
 
     const appointmentData = await appointmentModel.findById(appointmentId);
 
+    // console.log(appointmentData);
+
     // verify appopintment user
     if (appointmentData.userId !== userId) {
       return res.status(400).json({
@@ -320,6 +322,8 @@ export const cancelAppoitment = async (req, res) => {
     const doctorData = await doctorModel.findById(docId);
 
     let slots_booked = doctorData.slots_booked;
+
+    console.log("slotes:",slots_booked);
 
     slots_booked[slotDate] = slots_booked[slotDate].filter(
       (e) => e != slotTime
