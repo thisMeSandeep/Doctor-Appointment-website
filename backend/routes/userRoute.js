@@ -7,6 +7,8 @@ import {
   bookAppointment,
   ListAppointment,
   cancelAppoitment,
+  paymentRazorpay,
+  verifyRazorpay,
 } from "../controllers/userController.js";
 
 import authUser from "../middlewares/authUser.js";
@@ -26,5 +28,7 @@ userRouter.post(
 userRouter.post("/book-appointment", authUser, bookAppointment); //book appointment
 userRouter.get("/appointments", authUser, ListAppointment); // appointments list
 userRouter.post("/cancel-appointment", authUser, cancelAppoitment); //cancel appoitments
+userRouter.post("/payment-razorpay", authUser, paymentRazorpay); //make payment
+userRouter.post("/verifyRazorpay", authUser, verifyRazorpay); //verify payment
 
 export default userRouter;
