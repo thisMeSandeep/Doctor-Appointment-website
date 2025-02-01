@@ -10,10 +10,17 @@ const MyAppointments = () => {
   const { backendUrl, token } = useContext(AppContext);
 
   const [appointments, setAppointments] = useState([]);
+  const navigate = useNavigate();
+
 
   const months = ["jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  const navigate = useNavigate();
+  //format date
+
+  const formatDate = (slotDate) => {
+    const dateArray = slotDate.split('_');
+    return dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2];
+  }
 
   // get appointments list
 
@@ -31,12 +38,7 @@ const MyAppointments = () => {
     }
   }
 
-  //format date
 
-  const formatDate = (slotDate) => {
-    const dateArray = slotDate.split('_');
-    return dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2];
-  }
 
 
   // cancel appoitment
