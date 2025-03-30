@@ -6,8 +6,6 @@ import { toast } from "react-toastify";
 
 const MyProfile = () => {
 
-
-
   const [isEdit, setIsEdit] = useState(false);
 
   const { userData, setUserData, token, backendUrl, getUserData } = useContext(AppContext);

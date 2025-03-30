@@ -238,7 +238,7 @@ export const bookAppointment = async (req, res) => {
 
     const appointmentData = {
       userId,
-      doctorId: docId, // Update the key name to match your schema
+      doctorId: docId, 
       userData,
       docData,
       amount: docData.fees,
